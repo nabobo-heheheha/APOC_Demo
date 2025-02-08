@@ -991,6 +991,8 @@ while main:
     cancel = False
     inMain = True
 
+    
+
     #Program selection
     
     if hub.right_button.is_pressed(): #press right button to cycle through programs. cycling back isn't supported yet, but we are working on reallocating the buttons in the file system
