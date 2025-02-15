@@ -1,3 +1,5 @@
+# LEGO type:advanced slot:0 autostart
+
 # LEGO type:standard slot:1 autostart
 
 import math
@@ -1039,7 +1041,7 @@ while main:
             hub.status_light.on("white")
             hub.light_matrix.show_image("DUCK")
             exampleThree()
-            programselect = 5
+            programselect = 4
             hub.light_matrix.write(programselect)
         elif programselect == 4:
             hub.status_light.on('white')
