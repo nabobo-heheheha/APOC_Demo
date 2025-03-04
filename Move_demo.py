@@ -1,3 +1,7 @@
+# LEGO type:standard slot:0 autostart
+
+# LEGO type:standard slot:0 autostart
+
 import math
 from spike import PrimeHub, Motor, MotorPair, ColorSensor
 from spike.control import wait_for_seconds, Timer
@@ -35,9 +39,11 @@ dReglerLight = 0.0
 Initialize Motor
 left Motor: port F
 right Motor: port B
+
+C, D
 """
 
-smallMotorA = Motor('F')
+smallMotorA = Motor('D')
 smallMotorD = Motor('B')
 
 #Set variables based on robot
@@ -360,6 +366,42 @@ def breakFunction(args):
     if not inMain:
         cancel = True
 
+def driveMotor(rotations, speed, port):
+    """
+    Allows you to drive a small motor in parallel to driving with gyroStraightDrive
+    Parameters
+    -------------
+    rotations: the rotations the motor turns
+    speed: the speed at which the motor turns
+    port: the motor used. Note: this cannot be the same motors as configured in the motor Drivebase
+    """
+           
+    global runSmall
+    global run_generator
+
+    if cancel:
+        runSmall = False
+        run_generator = False
+
+    while runSmall:
+        smallMotor = Motor(port)
+        smallMotor.set_degrees_counted(0)
+
+        loop_small = True
+        while loop_small:
+            drivenDistance = smallMotor.get_degrees_counted()
+            smallMotor.start_at_power(speed)
+            if (abs(drivenDistance) > abs(rotations) * 360):
+                loop_small = False
+            if cancel:
+                loop_small = False
+            yield
+
+        smallMotor.stop()
+        runSmall = False
+        run_generator = False
+    yield
+
 
 hub2.motion.yaw_pitch_roll(0)
 
@@ -367,7 +409,12 @@ db = DriveBase(hub, 'F', 'B')
 def exampleOne():
     db.gyroStraightDrive(50, -25, -75, -25) #drives in a straight line for 50cm
     wait_for_seconds(0.15)
-    db.gyroStraightDrive(50, 25, 75, 25) #drives in a straight line for 50cm
+    generator = driveMotor(3, 80, 'C')  # 让C电机转5圈
+    db.gyroStraightDrive(50, 25, 75, 25, generator=generator)
+    wait_for_seconds(0.15)
+    motor = Motor('D')
+    motor.run_for_degrees(2 * 360, speed=80)  # 5圈 = 5 * 360度
+    wait_for_seconds(0.15) 
     return
     
 def exampleTwo():
